@@ -1,0 +1,162 @@
+digraph NFA {
+	graph [layout=osage ranksep=.3]
+	node [fontname=Courier fontsize=12 height=.1 shape=circle]
+	edge [arrowsize=.5]
+	S
+	S -> CLASS
+	S -> VOID
+	S -> FUNCTION
+	S -> PROTECTED
+	S -> INT
+	S -> BOOL
+	S -> DOUBLE
+	S -> STRING
+	S -> VAR
+	S -> IF
+	S -> ELSE
+	S -> WHILE
+	S -> DO
+	S -> FOR
+	S -> THIS
+	S -> RETURN
+	S -> NULL
+	S -> PRINT
+	S -> ID
+	S -> INTEGER
+	S -> FLOAT
+	S -> COMPLEX
+	S -> SCEIENCE
+	S -> LBLOCK
+	S -> RBLOCK
+	S -> LMBRACK
+	S -> RMBRACK
+	S -> LPAREN
+	S -> RPAREN
+	S -> SEMI
+	S -> DOT
+	S -> COLON
+	S -> COMMA
+	S -> PLUS
+	S -> MINUS
+	S -> MUL
+	S -> DIV
+	S -> ASSIGN
+	S -> EQ
+	S -> LT
+	S -> GT
+	S -> LE
+	S -> GE
+	CLASS -> CLASS1 [label=c]
+	VOID -> VOID1 [label=v]
+	FUNCTION -> FUNCTION1 [label=f]
+	PROTECTED -> PROTECTED1 [label=p]
+	INT -> INT1 [label=i]
+	BOOL -> BOOL1 [label=b]
+	DOUBLE -> DOUBLE1 [label=d]
+	STRING -> STRING1 [label=s]
+	STRING -> S_CHAR [label="\""]
+	STRING -> R_QUOTE [label="\""]
+	VAR -> VAR1 [label=v]
+	IF -> IF1 [label=i]
+	ELSE -> ELSE1 [label=e]
+	WHILE -> WHILE1 [label=w]
+	DO -> DO1 [label=d]
+	FOR -> FOR1 [label=f]
+	THIS -> THIS1 [label=t]
+	RETURN -> RETURN1 [label=r]
+	NULL -> NULL1 [label=n]
+	PRINT -> PRINT1 [label=p]
+	ID -> NUM [label=a]
+	FLOAT -> DOTINTEGER [label=0]
+	COMPLEX -> COMPLEX_P [label=0]
+	SCEIENCE -> SCEIENCE_D [label=0]
+	LBLOCK [shape=doublecircle]
+	RBLOCK [shape=doublecircle]
+	LMBRACK [shape=doublecircle]
+	RMBRACK [shape=doublecircle]
+	LPAREN [shape=doublecircle]
+	RPAREN [shape=doublecircle]
+	SEMI [shape=doublecircle]
+	DOT [shape=doublecircle]
+	COLON [shape=doublecircle]
+	COMMA [shape=doublecircle]
+	PLUS [shape=doublecircle]
+	MINUS [shape=doublecircle]
+	MUL [shape=doublecircle]
+	DIV [shape=doublecircle]
+	ASSIGN [shape=doublecircle]
+	LT [shape=doublecircle]
+	GT [shape=doublecircle]
+	CLASS1 -> CLASS2 [label=l]
+	VOID1 -> VOID2 [label=o]
+	FUNCTION1 -> FUNCTION2 [label=u]
+	PROTECTED1 -> PROTECTED2 [label=r]
+	INT1 -> INT2 [label=n]
+	BOOL1 -> BOOL2 [label=o]
+	DOUBLE1 -> DOUBLE2 [label=o]
+	STRING1 -> STRING2 [label=t]
+	R_QUOTE [shape=doublecircle]
+	VAR1 -> VAR2 [label=a]
+	IF1 [shape=doublecircle]
+	ELSE1 -> ELSE2 [label=l]
+	WHILE1 -> WHILE2 [label=h]
+	DO1 [shape=doublecircle]
+	FOR1 -> FOR2 [label=o]
+	THIS1 -> THIS2 [label=h]
+	RETURN1 -> RETURN2 [label=e]
+	NULL1 -> NULL2 [label=u]
+	PRINT1 -> PRINT2 [label=r]
+	COMPLEX_P -> COMPLEX_R [label="+"]
+	SCEIENCE_D -> SCEIENCE_F [label="."]
+	CLASS2 -> CLASS3 [label=a]
+	VOID2 -> VOID3 [label=i]
+	FUNCTION2 -> FUNCTION3 [label=n]
+	PROTECTED2 -> PROTECTED3 [label=o]
+	INT2 [shape=doublecircle]
+	BOOL2 -> BOOL3 [label=o]
+	DOUBLE2 -> DOUBLE3 [label=u]
+	STRING2 -> STRING3 [label=r]
+	VAR2 [shape=doublecircle]
+	ELSE2 -> ELSE3 [label=s]
+	WHILE2 -> WHILE3 [label=i]
+	FOR2 [shape=doublecircle]
+	THIS2 -> THIS3 [label=i]
+	RETURN2 -> RETURN3 [label=t]
+	NULL2 -> NULL3 [label=l]
+	PRINT2 -> PRINT3 [label=i]
+	COMPLEX_R -> COMPLEX_I [label=0]
+	SCEIENCE_F -> SCEIENCE_E [label=0]
+	CLASS3 -> CLASS4 [label=s]
+	VOID3 [shape=doublecircle]
+	FUNCTION3 -> FUNCTION4 [label=c]
+	PROTECTED3 -> PROTECTED4 [label=t]
+	BOOL3 [shape=doublecircle]
+	DOUBLE3 -> DOUBLE4 [label=b]
+	STRING3 -> STRING4 [label=i]
+	ELSE3 [shape=doublecircle]
+	WHILE3 -> WHILE4 [label=l]
+	THIS3 [shape=doublecircle]
+	RETURN3 -> RETURN4 [label=u]
+	NULL3 [shape=doublecircle]
+	PRINT3 -> PRINT4 [label=n]
+	COMPLEX_I [shape=doublecircle]
+	SCEIENCE_E -> SCEIENCE_R [label=E]
+	CLASS4 [shape=doublecircle]
+	FUNCTION4 -> FUNCTION5 [label=t]
+	PROTECTED4 -> PROTECTED5 [label=e]
+	DOUBLE4 -> DOUBLE5 [label=l]
+	STRING4 -> STRING5 [label=n]
+	WHILE4 [shape=doublecircle]
+	RETURN4 -> RETURN5 [label=r]
+	PRINT4 [shape=doublecircle]
+	FUNCTION5 -> FUNCTION6 [label=i]
+	PROTECTED5 -> PROTECTED6 [label=c]
+	DOUBLE5 [shape=doublecircle]
+	STRING5 [shape=doublecircle]
+	RETURN5 [shape=doublecircle]
+	FUNCTION6 -> FUNCTION7 [label=o]
+	PROTECTED6 -> PROTECTED7 [label=t]
+	FUNCTION7 [shape=doublecircle]
+	PROTECTED7 -> PROTECTED8 [label=e]
+	PROTECTED8 [shape=doublecircle]
+}

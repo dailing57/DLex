@@ -28,11 +28,12 @@ class NFAVisualizer:
             for e in self.nfa.mp[u]:
                 for v in self.nfa.mp[u][e]:
                     self.dot.edge(u, v, label=e)
-                    if v == 'E':
-                        self.dot.node(u, shape='doublecircle')
                     if (v not in vis) and (v != 'E'):
                         q.append(v)
                         vis.add(v)
+        for it in self.nfa.nodes:
+            if self.nfa.nodes[it].isEnd:
+                self.dot.node(it, shape='doublecircle')
 
 
 def main():

@@ -58,11 +58,7 @@ class NFA:
                         self.mp[arr[0]][arr[2]] = [arr[3]]
                     else:
                         self.mp[arr[0]][arr[2]].append(arr[3])
-        for u in self.mp:
-            for e in self.mp[u]:
-                for v in self.mp[u][e]:
-                    if v == 'E' or self.nodes[v].canBeEmpty:
-                        self.nodes[u].isEnd = True
+        self.nodes['E'] = NFANode(isEnd=True, canBeEmpty=True)
 
 
 def main():

@@ -22,8 +22,7 @@ class Token:
 
 
 class NFANode:
-    def __init__(self, canBeEmpty=False, isEnd=False) -> None:
-        self.canBeEmpty = canBeEmpty
+    def __init__(self, isEnd=False) -> None:
         self.isEnd = isEnd
 
 
@@ -39,26 +38,20 @@ class NFA:
             arr = line.split()
             if len(arr) < 3 or arr[0] == '#':
                 continue
-            if len(arr[0]) >= 6 and arr[0][:6] == 'START_':
-                arr[0] = arr[0][6:]
-                if arr[0] not in self.nodes:
-                    self.starts.append(arr[0])
+            if arr[0] == 'S':
+                self.starts.append(arr[3])
             if arr[0] not in self.nodes:
                 self.nodes[arr[0]] = NFANode()
             if len(arr) == 3 and arr[2] == 'E':
-                self.nodes[arr[0]].canBeEmpty = True
                 self.nodes[arr[0]].isEnd = True
+            elif arr[0] not in self.mp:
+                self.mp[arr[0]] = {arr[2]: [arr[3]]}
             else:
-                if len(arr[3]) >= 6 and arr[3][:6] == 'START_':
-                    arr[3] = arr[3][6:]
-                if arr[0] not in self.mp:
-                    self.mp[arr[0]] = {arr[2]: [arr[3]]}
+                if arr[2] not in self.mp[arr[0]]:
+                    self.mp[arr[0]][arr[2]] = [arr[3]]
                 else:
-                    if arr[2] not in self.mp[arr[0]]:
-                        self.mp[arr[0]][arr[2]] = [arr[3]]
-                    else:
-                        self.mp[arr[0]][arr[2]].append(arr[3])
-        self.nodes['E'] = NFANode(isEnd=True, canBeEmpty=True)
+                    self.mp[arr[0]][arr[2]].append(arr[3])
+        self.nodes['E'] = NFANode(isEnd=True)
 
 
 def main():

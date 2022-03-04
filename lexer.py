@@ -56,7 +56,8 @@ class NFA:
                 else:
                     if arr[2] not in self.mp[arr[0]]:
                         self.mp[arr[0]][arr[2]] = [arr[3]]
-                    self.mp[arr[0]][arr[2]].append(arr[3])
+                    else:
+                        self.mp[arr[0]][arr[2]].append(arr[3])
         for u in self.mp:
             for e in self.mp[u]:
                 for v in self.mp[u][e]:

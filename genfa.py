@@ -1,4 +1,3 @@
-from turtle import shape
 from lexer import NFA
 import argparse
 from graphviz import Digraph
@@ -14,7 +13,7 @@ class NFAVisualizer:
         },
             edge_attr={"arrowsize": ".5"},
             format="png",
-            graph_attr={"ranksep": ".3", "layout": "osage"})
+            graph_attr={"ranksep": ".3", "layout": "dot"})
 
     def bfs(self):
         q = []
@@ -28,10 +27,10 @@ class NFAVisualizer:
             u = q.pop(0)
             for e in self.nfa.mp[u]:
                 for v in self.nfa.mp[u][e]:
+                    self.dot.edge(u, v, label=e)
                     if v == 'E':
                         self.dot.node(u, shape='doublecircle')
                     if (v not in vis) and (v != 'E'):
-                        self.dot.edge(u, v, label=e)
                         q.append(v)
                         vis.add(v)
 

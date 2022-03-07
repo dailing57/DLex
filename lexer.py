@@ -122,37 +122,42 @@ class DFA(NFA):
                     edges.add(e)
         st = set()
         startst = set()
-        st.add(frozenset(self.ends))
+        fends = frozenset(self.ends)
+        st.add(fends)
         for it in self.dfa:
             if it not in self.ends:
                 startst.add(it)
         st.add(frozenset(startst))
-        for e in edges:
-            print(st)
-            print()
-            while True:
-                mp = {}
-                for it in st:
-                    for u in it:
-                        mp[u] = it
-                tmp = set()
-                for it in st:
-                    # 对于当前集合里的元素，如何划分
-                    div = {}
-                    for u in it:
-                        if e not in self.dfa[u]:
-                            continue
-                        v = mp[self.dfa[u][e]]
-                        if v not in div:
-                            div[v] = set()
-                        div[v].add(u)
-                    for v in div:
-                        tmp.add(frozenset(div[v]))
-                print(tmp)
-                print('\n\n')
-                if len(st) == len(tmp):
-                    break
+        # Hopcroft
+        W = {fends}
+        while len(W) > 0:
+            A = W.pop()
+            for e in edges:
+                X = set()
+                for u in A:
+                    if e not in self.dfa[u]:
+                        continue
+                    X.add(self.dfa[u][e])
+                tmp = st.copy()
+                for Y in st:
+                    YaX = frozenset(Y & X)
+                    YsX = frozenset(Y - X)
+                    if len(YaX) > 0 and len(YsX) > 0:
+                        tmp.remove(Y)
+                        tmp.add(YaX)
+                        tmp.add(YsX)
+                        if Y in W:
+                            W.remove(Y)
+                            W.add(YaX)
+                            W.add(YsX)
+                        else:
+                            if len(YaX) <= len(YsX):
+                                W.add(YaX)
+                            else:
+                                W.add(YsX)
                 st = tmp
+
+        # 处理最终的集合
         tmp = {}
         for it in st:
             tt = set()

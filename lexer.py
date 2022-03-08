@@ -1,7 +1,6 @@
 import argparse
-from hashlib import new
-import sys
-from tkinter import N
+import json
+import pickle
 
 
 class Token:
@@ -23,9 +22,10 @@ class Token:
         return self.__str__()
 
 
-class NFANode:
+class Node:
     def __init__(self, isEnd=False) -> None:
         self.isEnd = isEnd
+        self.types = set()
 
 
 class NFA:
@@ -40,16 +40,16 @@ class NFA:
             arr = line.split()
             if len(arr) < 3 or arr[0] == '#':
                 continue
+            if arr[0] not in self.nodes:
+                self.nodes[arr[0]] = Node()
             if arr[0] == 'S':
                 self.starts.append(arr[3])
-            if arr[0] not in self.nodes:
-                self.nodes[arr[0]] = NFANode()
             if len(arr) == 3 and arr[2] == 'E':
                 self.nodes[arr[0]].isEnd = True
             else:
                 if arr[3] not in self.mp:
                     self.mp[arr[3]] = {}
-                    self.nodes[arr[3]] = NFANode()
+                    self.nodes[arr[3]] = Node()
                 if arr[0] not in self.mp:
                     self.mp[arr[0]] = {arr[2]: [arr[3]]}
                 else:
@@ -57,14 +57,28 @@ class NFA:
                         self.mp[arr[0]][arr[2]] = [arr[3]]
                     else:
                         self.mp[arr[0]][arr[2]].append(arr[3])
-        self.nodes['E'] = NFANode(isEnd=True)
+        self.nodes['E'] = Node(isEnd=True)
         self.mp['E'] = {}
+
+        for it in self.starts:
+            self.nodes[it].types.add(it)
+        q = ['S']
+        vis = {'S'}
+        while len(q) > 0:
+            u = q.pop(0)
+            for e in self.mp[u]:
+                for v in self.mp[u][e]:
+                    self.nodes[v].types |= self.nodes[u].types
+                    if v not in vis:
+                        vis.add(v)
+                        q.append(v)
 
 
 class DFA(NFA):
     def __init__(self, text) -> None:
         super(DFA, self).__init__(text)
         self.dfa = {}
+        self.DNodes = {}
         self.root = frozenset()
         self.ends = set()
         self.NtoD()
@@ -159,19 +173,22 @@ class DFA(NFA):
 
         # 处理最终的集合
         tmp = {}
+        tot = 0
         for it in st:
-            tt = set()
+            tot += 1
             isStart = False
+            cur = Node()
             for u in it:
                 if u == self.root:
                     isStart = True
                 for v in u:
-                    tt.add(v)
-            fz = frozenset(tt)
+                    cur.types |= self.nodes[v].types
+                    cur.isEnd = cur.isEnd or self.nodes[v].isEnd
             for u in it:
-                tmp[u] = fz
+                tmp[u] = tot
+                self.DNodes[tot] = cur
             if isStart:
-                self.root = fz
+                self.root = tot
         newDfa = {}
         for it in st:
             for u in it:
@@ -183,12 +200,10 @@ class DFA(NFA):
                     if tmp[v] not in newDfa:
                         newDfa[tmp[v]] = {}
         self.dfa = newDfa
-        tmpE = set()
-        for it in self.dfa:
-            for u in it:
-                if self.nodes[u].isEnd:
-                    tmpE.add(frozenset(it))
-        self.ends = tmpE
+        self.ends = set()
+        for it in self.DNodes:
+            if self.DNodes[it].isEnd:
+                self.ends.add(it)
 
 
 def main():

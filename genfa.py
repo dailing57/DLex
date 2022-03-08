@@ -1,7 +1,7 @@
-from tkinter import N
 from lexer import NFA, DFA
 import argparse
 from graphviz import Digraph
+import LexIO
 
 
 class FAVisualizer:
@@ -35,19 +35,17 @@ class FAVisualizer:
 
     def bfsD(self):
         q = [self.dfa.root]
-        vis = {self.dfa.root: 1}
-        cnt = 1
+        vis = {self.dfa.root}
         while len(q) > 0:
             u = q.pop(0)
             for e in self.dfa.dfa[u]:
                 v = self.dfa.dfa[u][e]
                 if v not in vis:
-                    cnt += 1
-                    vis[v] = cnt
+                    vis.add(v)
                     q.append(v)
-                self.dot.edge(str(vis[u]), str(vis[v]), label=e)
+                self.dot.edge(str(u), str(v), label=e)
         for it in self.dfa.ends:
-            self.dot.node(str(vis[it]), shape='doublecircle')
+            self.dot.node(str(it), shape='doublecircle')
 
 
 def main():
@@ -55,16 +53,23 @@ def main():
         description='Draw the FA graph'
     )
     parser.add_argument('inputfile', help='rule file')
-    parser.add_argument('mode', help='NFA or DFA')
+    parser.add_argument(
+        'mode', help='NFA or DFA or sDFA (serialized DFA pickle file)')
     args = parser.parse_args()
-    text = open(args.inputfile, encoding='utf-8')
     if(args.mode == 'NFA'):
+        text = open(args.inputfile, encoding='utf-8')
         nfa = NFA(text)
         nfaVis = FAVisualizer(nfa=nfa)
         nfaVis.bfsN()
         nfaVis.dot.view('NFA')
-    if(args.mode == 'DFA'):
+    elif(args.mode == 'DFA'):
+        text = open(args.inputfile, encoding='utf-8')
         dfa = DFA(text)
+        dfaVis = FAVisualizer(dfa=dfa)
+        dfaVis.bfsD()
+        dfaVis.dot.view('DFA')
+    elif(args.mode == 'sDFA'):
+        dfa = LexIO.readPickle(args.inputfile)
         dfaVis = FAVisualizer(dfa=dfa)
         dfaVis.bfsD()
         dfaVis.dot.view('DFA')

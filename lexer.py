@@ -206,6 +206,15 @@ class DFA(NFA):
                 self.ends.add(it)
 
 
+class LexParser:
+    def __init__(self, text, dfa) -> None:
+        self.text = text
+        self.dfa = dfa
+
+    def parse(self):
+        pass
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='DLex - DL\'s Lexer'

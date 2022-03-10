@@ -31,7 +31,6 @@ class FAVisualizer:
         for it in self.nfa.nodes:
             if self.nfa.nodes[it].isEnd:
                 self.dot.node(it, shape='doublecircle')
-        print(len(vis))
 
     def bfsD(self):
         q = [self.dfa.root]

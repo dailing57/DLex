@@ -1,6 +1,4 @@
 import argparse
-import json
-import pickle
 
 
 class Token:
@@ -27,6 +25,15 @@ class Node:
         self.isEnd = isEnd
         self.types = set()
 
+    def __str__(self) -> str:
+        return 'Node(isEnd:{isEnd},types:{types})\n'.format(
+            types=self.types,
+            isEnd=self.isEnd
+        )
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
 
 class NFA:
     def __init__(self, text) -> None:
@@ -36,6 +43,7 @@ class NFA:
         self.parse(text)
 
     def parse(self, text):
+        cnt = 0
         for line in text.readlines():
             arr = line.split()
             if len(arr) < 3 or arr[0] == '#':
@@ -46,6 +54,7 @@ class NFA:
                 self.starts.append(arr[3])
             if len(arr) == 3 and arr[2] == 'E':
                 self.nodes[arr[0]].isEnd = True
+                cnt += 1
             else:
                 if arr[3] not in self.mp:
                     self.mp[arr[3]] = {}
@@ -57,9 +66,9 @@ class NFA:
                         self.mp[arr[0]][arr[2]] = [arr[3]]
                     else:
                         self.mp[arr[0]][arr[2]].append(arr[3])
-        self.nodes['E'] = Node(isEnd=True)
-        self.mp['E'] = {}
-
+        for u in self.mp:
+            if len(self.mp[u]) == 0:
+                self.nodes[u].isEnd = True
         for it in self.starts:
             self.nodes[it].types.add(it)
         q = ['S']
@@ -83,6 +92,7 @@ class DFA(NFA):
         self.ends = set()
         self.NtoD()
         self.minimize()
+        print(self.DNodes)
 
     def emClosure(self, st):
         res = set()
@@ -141,20 +151,21 @@ class DFA(NFA):
         for it in self.dfa:
             if it not in self.ends:
                 startst.add(it)
-        st.add(frozenset(startst))
+        fstartst = frozenset(startst)
+        st.add(fstartst)
         # Hopcroft
-        W = {fends}
+        W = {fstartst}
         while len(W) > 0:
             A = W.pop()
             for e in edges:
                 X = set()
-                for u in A:
-                    if e not in self.dfa[u]:
-                        continue
-                    X.add(self.dfa[u][e])
+                for u in self.dfa:
+                    if e in self.dfa[u] and self.dfa[u][e] in A:
+                        X.add(u)
                 tmp = st.copy()
+                X = frozenset(X)
                 for Y in st:
-                    YaX = frozenset(Y & X)
+                    YaX = frozenset(X & Y)
                     YsX = frozenset(Y - X)
                     if len(YaX) > 0 and len(YsX) > 0:
                         tmp.remove(Y)
@@ -211,8 +222,18 @@ class LexParser:
         self.text = text
         self.dfa = dfa
 
+    def next(self, curState, curChar):
+        disState = -1
+        if curChar in self.dfa.dfa[curState]:
+            disState = self.dfa.dfa[curState][curChar]
+
     def parse(self):
-        pass
+        row = 0
+        for line in self.text.readlines():
+            row += 1
+            st = set()
+            for col in range(len(line)):
+                curState = next(curState, line[col])
 
 
 def main():

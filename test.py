@@ -1,14 +1,7 @@
-import lexer
+a = {frozenset({'7'}), frozenset({'5'}), frozenset({'6'})}
+b = {frozenset({'5'}), frozenset({'3'}), frozenset({'6'})}
 
 
-def main():
-    text = open('rule.txt', encoding='utf-8')
-    dfa = lexer.DFA(text)
-    lexio = lexer.LexIO()
-    lexio.DFAwrite('DFAresult.txt', dfa)
-    dfa = lexio.DFALoad('DFAresult.txt', dfa)
-    print(dfa)
-
-
-if __name__ == '__main__':
-    main()
+p = frozenset({frozenset({'7'})})
+q = frozenset({frozenset({'5'}), frozenset({'7'})})
+print(p & q)

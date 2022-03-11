@@ -1,12 +1,13 @@
 import argparse
+from distutils.log import error
 
 
 class Token:
-    def __init__(self) -> None:
-        self.col = 0
-        self.row = 0
-        self.type = ''
-        self.value = ''
+    def __init__(self, col=-1, row=-1, type=set(), value='') -> None:
+        self.col = col
+        self.row = row
+        self.type = type
+        self.value = value
 
     def __str__(self):
         return 'Token({type}, {value}, position={lineno}:{column})'.format(
@@ -92,7 +93,6 @@ class DFA(NFA):
         self.ends = set()
         self.NtoD()
         self.minimize()
-        print(self.DNodes)
 
     def emClosure(self, st):
         res = set()
@@ -217,33 +217,27 @@ class DFA(NFA):
                 self.ends.add(it)
 
 
-class LexParser:
-    def __init__(self, text, dfa) -> None:
-        self.text = text
-        self.dfa = dfa
+class Error(Exception):
+    def __init__(self, error_code=None, token=None, message=None):
+        self.error_code = error_code
+        self.token = token
+        self.message = f'{self.__class__.__name__}: {message}'
 
-    def next(self, curState, curChar):
-        disState = -1
-        if curChar in self.dfa.dfa[curState]:
-            disState = self.dfa.dfa[curState][curChar]
 
-    def parse(self):
-        row = 0
-        for line in self.text.readlines():
-            row += 1
-            st = set()
-            for col in range(len(line)):
-                curState = next(curState, line[col])
+class LexerError(Error):
+    pass
 
 
 def main():
     parser = argparse.ArgumentParser(
         description='DLex - DL\'s Lexer'
     )
-    parser.add_argument('inputfile', help='rule file')
+    parser.add_argument('rulefile', help='rule file')
+    parser.add_argument('codefile', help='code file')
     args = parser.parse_args()
-    text = open(args.inputfile, 'r')
-    nfa = NFA(text)
+    text = open(args.rulefile, 'r')
+    code = open(args.codefile, 'r')
+    dfa = DFA(text)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,8 @@
+digraph NFA {
+	graph [layout=dot ranksep=.3]
+	node [fontname=Courier fontsize=12 height=.1 shape=circle]
+	edge [arrowsize=.5]
+	2 -> 1 [label=";"]
+	2 -> 1 [label="!"]
+	1 [shape=doublecircle]
+}

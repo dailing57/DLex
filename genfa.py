@@ -1,5 +1,6 @@
 from lexer import NFA, DFA
 import argparse
+from GrParser import LexParser, LexerError
 from graphviz import Digraph
 import LexIO
 
@@ -57,13 +58,16 @@ def main():
     args = parser.parse_args()
     if(args.mode == 'NFA'):
         text = open(args.inputfile, encoding='utf-8')
-        nfa = NFA(text)
+        nfa = NFA()
+        LexParser().genNFA(nfa=nfa, text=text)
         nfaVis = FAVisualizer(nfa=nfa)
         nfaVis.bfsN()
         nfaVis.dot.view('NFA')
     elif(args.mode == 'DFA'):
         text = open(args.inputfile, encoding='utf-8')
-        dfa = DFA(text)
+        nfa = NFA()
+        LexParser().genNFA(nfa, text)
+        dfa = DFA(nfa)
         dfaVis = FAVisualizer(dfa=dfa)
         dfaVis.bfsD()
         dfaVis.dot.view('DFA')

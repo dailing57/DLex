@@ -1,5 +1,4 @@
 import argparse
-from distutils.log import error
 
 
 class Token:
@@ -37,56 +36,17 @@ class Node:
 
 
 class NFA:
-    def __init__(self, text) -> None:
-        self.mp = {}
-        self.nodes = {}
-        self.starts = []
-        self.parse(text)
-
-    def parse(self, text):
-        cnt = 0
-        for line in text.readlines():
-            arr = line.split()
-            if len(arr) < 3 or arr[0] == '#':
-                continue
-            if arr[0] not in self.nodes:
-                self.nodes[arr[0]] = Node()
-            if arr[0] == 'S':
-                self.starts.append(arr[3])
-            if len(arr) == 3 and arr[2] == 'E':
-                self.nodes[arr[0]].isEnd = True
-                cnt += 1
-            else:
-                if arr[3] not in self.mp:
-                    self.mp[arr[3]] = {}
-                    self.nodes[arr[3]] = Node()
-                if arr[0] not in self.mp:
-                    self.mp[arr[0]] = {arr[2]: [arr[3]]}
-                else:
-                    if arr[2] not in self.mp[arr[0]]:
-                        self.mp[arr[0]][arr[2]] = [arr[3]]
-                    else:
-                        self.mp[arr[0]][arr[2]].append(arr[3])
-        for u in self.mp:
-            if len(self.mp[u]) == 0:
-                self.nodes[u].isEnd = True
-        for it in self.starts:
-            self.nodes[it].types.add(it)
-        q = ['S']
-        vis = {'S'}
-        while len(q) > 0:
-            u = q.pop(0)
-            for e in self.mp[u]:
-                for v in self.mp[u][e]:
-                    self.nodes[v].types |= self.nodes[u].types
-                    if v not in vis:
-                        vis.add(v)
-                        q.append(v)
+    def __init__(self, mp={}, nodes={}, starts=[]) -> None:
+        self.mp = mp
+        self.nodes = nodes
+        self.starts = starts
 
 
 class DFA(NFA):
-    def __init__(self, text) -> None:
-        super(DFA, self).__init__(text)
+    def __init__(self, nfa: NFA) -> None:
+        self.mp = nfa.mp
+        self.nodes = nfa.nodes
+        self.starts = nfa.starts
         self.dfa = {}
         self.DNodes = {}
         self.root = frozenset()

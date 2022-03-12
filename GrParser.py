@@ -2,11 +2,51 @@ from lexer import *
 
 
 class LexParser:
-    def __init__(self, text, dfa) -> None:
+    def __init__(self, text=None) -> None:
         self.text = text
-        self.dfa: DFA = dfa
+        self.dfa: DFA
         self.row = 0
         self.col = 0
+
+    def genNFA(self, nfa, text):
+        cnt = 0
+        for line in text.readlines():
+            arr = line.split()
+            if len(arr) < 3 or arr[0] == '#':
+                continue
+            if arr[0] not in nfa.nodes:
+                nfa.nodes[arr[0]] = Node()
+            if arr[0] == 'S':
+                nfa.starts.append(arr[3])
+            if len(arr) == 3 and arr[2] == 'E':
+                nfa.nodes[arr[0]].isEnd = True
+                cnt += 1
+            else:
+                if arr[3] not in nfa.mp:
+                    nfa.mp[arr[3]] = {}
+                    nfa.nodes[arr[3]] = Node()
+                if arr[0] not in nfa.mp:
+                    nfa.mp[arr[0]] = {arr[2]: [arr[3]]}
+                else:
+                    if arr[2] not in nfa.mp[arr[0]]:
+                        nfa.mp[arr[0]][arr[2]] = [arr[3]]
+                    else:
+                        nfa.mp[arr[0]][arr[2]].append(arr[3])
+        for u in nfa.mp:
+            if len(nfa.mp[u]) == 0:
+                nfa.nodes[u].isEnd = True
+        for it in nfa.starts:
+            nfa.nodes[it].types.add(it)
+        q = ['S']
+        vis = {'S'}
+        while len(q) > 0:
+            u = q.pop(0)
+            for e in nfa.mp[u]:
+                for v in nfa.mp[u][e]:
+                    nfa.nodes[v].types |= nfa.nodes[u].types
+                    if v not in vis:
+                        vis.add(v)
+                        q.append(v)
 
     def error(self, curChar):
         s = "Lexer error on '{lexeme}' line: {row} column: {col}".format(
@@ -74,8 +114,10 @@ def main():
     args = parser.parse_args()
     text = open(args.rulefile, 'r')
     code = open(args.codefile, 'r')
-    dfa = DFA(text)
-    lp = LexParser(code, dfa)
+    nfa = NFA()
+    lp = LexParser(code)
+    lp.genNFA(nfa, text)
+    lp.dfa = DFA(nfa)
     for it in lp.parse():
         print('row:'+str(it.row) + ',col:' +
               str(it.col)+',value:' + str(it.value))

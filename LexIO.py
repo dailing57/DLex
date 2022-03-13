@@ -1,6 +1,3 @@
-from ast import arg
-from asyncore import read
-from numpy import amin
 import lexer
 import pickle
 import argparse

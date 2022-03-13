@@ -1,5 +1,8 @@
 import argparse
 
+Epsilon = 'EMP'
+Start = 'S'
+
 
 class Token:
     def __init__(self, col=-1, row=-1, type=set(), value='') -> None:
@@ -41,6 +44,13 @@ class NFA:
         self.nodes = nodes
         self.starts = starts
 
+    def link(self, u, e, v):
+        if u not in self.mp:
+            self.mp[u] = {e: [v]}
+            self.nodes[u] = Node()
+        if v not in self.nodes:
+            self.nodes[v] = Node()
+
 
 class DFA(NFA):
     def __init__(self, nfa: NFA) -> None:
@@ -62,15 +72,15 @@ class DFA(NFA):
             q.append(u)
         while len(q) > 0:
             u = q.pop(0)
-            if 'EMP' in self.mp[u]:
-                for v in self.mp[u]['EMP']:
+            if Epsilon in self.mp[u]:
+                for v in self.mp[u][Epsilon]:
                     if v not in res:
                         res.add(v)
                         q.append(v)
         return res
 
     def NtoD(self):
-        rt = frozenset(self.emClosure({'S'}))
+        rt = frozenset(self.emClosure({Start}))
         vis = {rt}
         q = [rt]
         self.root = rt
@@ -84,7 +94,7 @@ class DFA(NFA):
             stE = set()
             for u in st:
                 for e in self.mp[u]:
-                    if e == 'EMP':
+                    if e == Epsilon:
                         continue
                     stE.add(e)
                     if e not in self.dfa[st]:
@@ -102,7 +112,7 @@ class DFA(NFA):
         edges = set()
         for u in self.dfa:
             for e in self.dfa[u]:
-                if e != 'EMP':
+                if e != Epsilon:
                     edges.add(e)
         st = set()
         startst = set()

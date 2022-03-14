@@ -1,4 +1,6 @@
+import json
 from lexer import *
+from genfa import FAVisualizer
 
 
 class ReParserError(Error):
@@ -6,9 +8,8 @@ class ReParserError(Error):
 
 
 class RegexParser:
-    def __init__(self, regRule=None, name=None) -> None:
+    def __init__(self, regRule=None) -> None:
         self.regRule = regRule
-        self.name = name
         self.nfa = NFA()
         self.pos = 0
         self.curChar = regRule[0]
@@ -60,7 +61,7 @@ class RegexParser:
             self.nextChar(self.curChar)
         elif self.curChar == '[':
             self.nextChar('[')
-            range(fa)
+            self.range(fa)
             self.nextChar(']')
         elif self.curChar == '(':
             self.nextChar('(')
@@ -116,8 +117,31 @@ class RegexParser:
         self.nfa.link(Start, Epsilon, self.tot)
         ed = self.expr(self.tot)
         self.nfa.nodes[ed].isEnd = True
-        self.nfa.nodes[ed].types.add()
+        return self.nfa
+
+
+class RegexRuleConfig:
+    def __init__(self, config) -> None:
+        self.rules = json.load(config)
+
+    def parseRule(self):
+        for it in self.rules:
+            rp = RegexParser(self.rules[it])
+            self.rules[it] = DFA(rp.genNFA())
 
 
 class LexParser:
     pass
+
+
+def main():
+    config = open('config.json', 'r')
+    rr = RegexRuleConfig(config)
+    nfa = RegexParser(rr.rules['SCIENCE']).genNFA()
+    nfaVis = FAVisualizer(dfa=DFA(nfa))
+    nfaVis.bfsD()
+    nfaVis.dot.view('NFA')
+
+
+if __name__ == '__main__':
+    main()

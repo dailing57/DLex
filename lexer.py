@@ -48,11 +48,27 @@ class NFA:
         if u not in self.mp:
             self.mp[u] = {e: [v]}
             self.nodes[u] = Node()
-        if v not in self.nodes:
+        elif e not in self.mp[u]:
+            self.mp[u][e] = [v]
+        else:
+            self.mp[u][e].append(v)
+        if v not in self.mp:
+            self.mp[v] = {}
             self.nodes[v] = Node()
 
+    def __str__(self) -> str:
+        s = ''
+        for u in self.mp:
+            for e in self.mp[u]:
+                for v in self.mp[u][e]:
+                    s += str(u)+' '+str(e)+' '+str(v)+'\n'
+        return s
 
-class DFA(NFA):
+    def __repr__(self) -> str:
+        return self.__str__()
+
+
+class DFA:
     def __init__(self, nfa: NFA) -> None:
         self.mp = nfa.mp
         self.nodes = nfa.nodes

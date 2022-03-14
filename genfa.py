@@ -1,6 +1,6 @@
-from lexer import NFA, DFA
+from lexer import *
 import argparse
-from GrParser import LexParser, LexerError
+from GrParser import LexParser
 from graphviz import Digraph
 import LexIO
 
@@ -19,19 +19,21 @@ class FAVisualizer:
             graph_attr={"ranksep": ".3", "layout": "dot"})
 
     def bfsN(self):
-        q = ['S']
-        vis = set('S')
+        q = [Start]
+        vis = set(Start)
         while(len(q) > 0):
             u = q.pop(0)
             for e in self.nfa.mp[u]:
                 for v in self.nfa.mp[u][e]:
-                    self.dot.edge(u, v, label=e)
-                    if (v not in vis) and (v != 'E'):
+                    if e == '\\':
+                        e = '\\\\'
+                    self.dot.edge(str(u), str(v), label=e)
+                    if (v not in vis):
                         q.append(v)
                         vis.add(v)
         for it in self.nfa.nodes:
             if self.nfa.nodes[it].isEnd:
-                self.dot.node(it, shape='doublecircle')
+                self.dot.node(str(it), shape='doublecircle')
 
     def bfsD(self):
         q = [self.dfa.root]
@@ -43,6 +45,8 @@ class FAVisualizer:
                 if v not in vis:
                     vis.add(v)
                     q.append(v)
+                if e == '\\':
+                    e = '\\\\'
                 self.dot.edge(str(u), str(v), label=e)
         for it in self.dfa.ends:
             self.dot.node(str(it), shape='doublecircle')

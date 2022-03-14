@@ -19,6 +19,9 @@
     "FOR": "for",
     "THIS": "this",
     "RETURN": "return",
+    "IMPORT": "import",
+    "STRING": "string",
+    "MAIN": "main",
     "NULL": "null",
     "PRIN": "print",
     "PLUS": "\\+", 
@@ -46,10 +49,10 @@
     "CLP": "{", 
     "CRP": "}",
     "ID": "[_A-Za-z][_A-Za-z0-9]*",
-    "STRING": "\"[ -`]*\"",
+    "STRINGVALUE": "\"[ -!#-~(\\\\\")]*\"",
     "COMPLEX": "[0-9]+\\+[0-9]*i",
-    "SCIENCE": "[0-9]+.[0-9]+E[\\+\\-][0-9]+.?([0-9]*)?",
-    "INTEGER": "[1-9][0-9]*",
+    "SCIENCE": "[0-9]+(.[0-9]+)?E[\\+\\-][0-9]+(.[0-9]+)?",
+    "INTEGER": "[1-9][0-9]*|0",
     "TRUE": "true",
     "FALSE": "false"
 }

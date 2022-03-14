@@ -16,7 +16,7 @@ class LexParser:
                 continue
             if arr[0] not in nfa.nodes:
                 nfa.nodes[arr[0]] = Node()
-            if arr[0] == 'S':
+            if arr[0] == Start:
                 nfa.starts.append(arr[3])
             if len(arr) == 3 and arr[2] == 'E':
                 nfa.nodes[arr[0]].isEnd = True
@@ -37,8 +37,8 @@ class LexParser:
                 nfa.nodes[u].isEnd = True
         for it in nfa.starts:
             nfa.nodes[it].types.add(it)
-        q = ['S']
-        vis = {'S'}
+        q = [Start]
+        vis = {Start}
         while len(q) > 0:
             u = q.pop(0)
             for e in nfa.mp[u]:

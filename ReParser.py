@@ -10,7 +10,7 @@ class ReParserError(Error):
 class RegexParser:
     def __init__(self, regRule=None) -> None:
         self.regRule = regRule
-        self.nfa = NFA()
+        self.nfa = NFA(mp={}, nodes={}, starts=[])
         self.pos = 0
         self.curChar = regRule[0]
         self.tot = 0
@@ -31,6 +31,7 @@ class RegexParser:
             return None
 
     def range(self, fa):
+        ed = self.tot
         while(self.curChar is not None and self.curChar != ']'):
             if self.curChar == '\\':
                 self.nextChar(self.curChar)
@@ -45,9 +46,16 @@ class RegexParser:
                     r = self.curChar
                 self.nextChar(self.curChar)
                 for i in range(ord(l), ord(r)+1):
-                    self.nfa.link(fa, chr(i), self.tot)
+                    self.nfa.link(fa, chr(i), ed)
+            elif self.curChar == '(':
+                self.nextChar('(')
+                self.tot += 1
+                self.nfa.link(fa, Epsilon, self.tot)
+                tmp = self.expr(self.tot)
+                self.nfa.link(tmp, Epsilon, ed)
+                self.nextChar(')')
             else:
-                self.nfa.link(fa, self.curChar, self.tot)
+                self.nfa.link(fa, self.curChar, ed)
                 self.nextChar(self.curChar)
         if self.curChar is None:
             raise ReParserError(message='Unexpected EOF')
@@ -105,12 +113,13 @@ class RegexParser:
     def expr(self, fa):
         tot = self.termList(fa)
         self.tot += 1
-        self.nfa.link(tot, Epsilon, self.tot)
+        ed = self.tot
+        self.nfa.link(tot, Epsilon, ed)
         while self.curChar is not None and self.curChar == '|':
             self.nextChar('|')
             tmp = self.termList(fa)
-            self.nfa.link(tmp, Epsilon, self.tot)
-        return self.tot
+            self.nfa.link(tmp, Epsilon, ed)
+        return ed
 
     def genNFA(self):
         self.tot += 1
@@ -131,16 +140,85 @@ class RegexRuleConfig:
 
 
 class LexParser:
-    pass
+    def __init__(self, config) -> None:
+        rrc = RegexRuleConfig(config)
+        rrc.parseRule()
+        self.rrc = rrc.rules
+        self.row = 0
+        self.col = 0
+
+    def next(self, cur, c):
+        tmp = {}
+        for it in cur:
+            u = cur[it]
+            if c in self.rrc[it].dfa[u]:
+                tmp[it] = self.rrc[it].dfa[u][c]
+        return tmp
+
+    def parse(self, code):
+        cur = {}
+        tokens = []
+        for it in self.rrc:
+            cur[it] = self.rrc[it].root
+        for line in code.readlines():
+            self.row += 1
+            self.col = 0
+            while self.col < len(line) and line[self.col].isspace():
+                self.col += 1
+            tk = Token()
+            c = ''
+            while self.col < len(line):
+                c = line[self.col]
+                tmp = self.next(cur, c)
+                if len(tmp) == 0:
+                    curEnds = []
+                    for it in cur:
+                        u = cur[it]
+                        if self.rrc[it].DNodes[u].isEnd:
+                            curEnds.append(it)
+                    for it in curEnds:
+                        if len(curEnds) > 1:
+                            if it != 'ID':
+                                tk.type = it
+                        else:
+                            tk.type = it
+                    tk.col = self.col
+                    tk.row = self.row
+                    tokens.append(tk)
+                    tk = Token()
+                    for it in self.rrc:
+                        cur[it] = self.rrc[it].root
+                    while self.col < len(line) and line[self.col].isspace():
+                        self.col += 1
+                else:
+                    cur = tmp
+                    tk.value += c
+                    self.col += 1
+            if c != '\n':
+                curEnds = []
+                for it in cur:
+                    u = cur[it]
+                    if self.rrc[it].DNodes[u].isEnd:
+                        curEnds.append(it)
+                for it in curEnds:
+                    if len(curEnds) > 1:
+                        if it != 'ID':
+                            tk.type = it
+                    else:
+                        tk.type = it
+                tk.col = self.col
+                tk.row = self.row
+                tokens.append(tk)
+        return tokens
 
 
 def main():
     config = open('config.json', 'r')
-    rr = RegexRuleConfig(config)
-    nfa = RegexParser(rr.rules['SCIENCE']).genNFA()
-    nfaVis = FAVisualizer(dfa=DFA(nfa))
-    nfaVis.bfsD()
-    nfaVis.dot.view('NFA')
+    code = open('./test/testcode', 'r')
+    lp = LexParser(config)
+    tokens = lp.parse(code)
+    for it in tokens:
+        print(it)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,5 @@
 import json
 from lexer import *
-from genfa import FAVisualizer
 
 
 class ReParserError(Error):
@@ -155,22 +154,57 @@ class LexParser:
                 tmp[it] = self.rrc[it].dfa[u][c]
         return tmp
 
+    def error(self, curChar):
+        s = "Lexer error on '{lexeme}' line: {row} column: {col}".format(
+            lexeme=curChar,
+            row=self.row,
+            col=self.col,
+        )
+        raise LexerError(message=s)
+
     def parse(self, code):
         cur = {}
         tokens = []
         for it in self.rrc:
             cur[it] = self.rrc[it].root
-        for line in code.readlines():
-            self.row += 1
-            self.col = 0
-            while self.col < len(line) and line[self.col].isspace():
-                self.col += 1
-            tk = Token()
-            c = ''
-            while self.col < len(line):
-                c = line[self.col]
-                tmp = self.next(cur, c)
-                if len(tmp) == 0:
+        try:
+            for line in code.readlines():
+                self.row += 1
+                self.col = 0
+                while self.col < len(line) and line[self.col].isspace():
+                    self.col += 1
+                tk = Token()
+                c = ''
+                while self.col < len(line):
+                    c = line[self.col]
+                    tmp = self.next(cur, c)
+                    if len(tmp) == 0:
+                        curEnds = []
+                        for it in cur:
+                            u = cur[it]
+                            if self.rrc[it].DNodes[u].isEnd:
+                                curEnds.append(it)
+                        for it in curEnds:
+                            if len(curEnds) > 1:
+                                if it != 'ID':
+                                    tk.type = it
+                            else:
+                                tk.type = it
+                        if tk.type == set():
+                            self.error(c)
+                        tk.col = self.col
+                        tk.row = self.row
+                        tokens.append(tk)
+                        tk = Token()
+                        for it in self.rrc:
+                            cur[it] = self.rrc[it].root
+                        while self.col < len(line) and line[self.col].isspace():
+                            self.col += 1
+                    else:
+                        cur = tmp
+                        tk.value += c
+                        self.col += 1
+                if c != '\n':
                     curEnds = []
                     for it in cur:
                         u = cur[it]
@@ -182,33 +216,13 @@ class LexParser:
                                 tk.type = it
                         else:
                             tk.type = it
+                    if tk.type == set():
+                        self.error(c)
                     tk.col = self.col
                     tk.row = self.row
                     tokens.append(tk)
-                    tk = Token()
-                    for it in self.rrc:
-                        cur[it] = self.rrc[it].root
-                    while self.col < len(line) and line[self.col].isspace():
-                        self.col += 1
-                else:
-                    cur = tmp
-                    tk.value += c
-                    self.col += 1
-            if c != '\n':
-                curEnds = []
-                for it in cur:
-                    u = cur[it]
-                    if self.rrc[it].DNodes[u].isEnd:
-                        curEnds.append(it)
-                for it in curEnds:
-                    if len(curEnds) > 1:
-                        if it != 'ID':
-                            tk.type = it
-                    else:
-                        tk.type = it
-                tk.col = self.col
-                tk.row = self.row
-                tokens.append(tk)
+        except LexerError as e:
+            print(e.message)
         return tokens
 
 

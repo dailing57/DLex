@@ -1,0 +1,2 @@
+graphviz==0.19.1
+setuptools==56.0.0

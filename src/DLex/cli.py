@@ -1,11 +1,9 @@
 import argparse
-
-from numpy import require
-import ReParser
-import GrParser
-import LexIO
-import genfa
-import lexer
+from . import ReParser
+from . import GrParser
+from . import LexIO
+from . import genfa
+from . import lexer
 
 
 def main():

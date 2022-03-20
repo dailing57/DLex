@@ -1,0 +1,15 @@
+LICENSE
+README.md
+pyproject.toml
+setup.py
+src/DLex/GrParser.py
+src/DLex/LexIO.py
+src/DLex/ReParser.py
+src/DLex/__init__.py
+src/DLex/cli.py
+src/DLex/genfa.py
+src/DLex/lexer.py
+src/DLex_DeaL.egg-info/PKG-INFO
+src/DLex_DeaL.egg-info/SOURCES.txt
+src/DLex_DeaL.egg-info/dependency_links.txt
+src/DLex_DeaL.egg-info/top_level.txt

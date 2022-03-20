@@ -1,8 +1,8 @@
-from lexer import *
+from .lexer import *
 import argparse
-from GrParser import LexParser
+from .GrParser import LexParser
 from graphviz import Digraph
-import LexIO
+from . import LexIO
 
 
 class FAVisualizer:

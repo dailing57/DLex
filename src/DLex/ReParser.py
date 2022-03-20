@@ -1,5 +1,5 @@
 import json
-from lexer import *
+from .lexer import *
 
 
 class ReParserError(Error):

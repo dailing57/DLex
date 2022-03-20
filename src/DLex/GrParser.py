@@ -1,4 +1,4 @@
-from lexer import *
+from .lexer import *
 
 
 class LexParser:

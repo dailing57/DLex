@@ -131,17 +131,33 @@ class RegexParser:
 class RegexRuleConfig:
     def __init__(self, config) -> None:
         self.rules = json.load(config)
-
-    def parseRule(self):
         for it in self.rules:
             rp = RegexParser(self.rules[it])
             self.rules[it] = DFA(rp.genNFA())
 
 
+class IToken:
+    def __init__(self, rule: str, valCal=None) -> None:
+        self.rule = rule
+        self.valCal = valCal
+
+
+class PyConfig:
+    def __init__(self, config: dict[str, IToken]) -> None:
+        self.rules: dict[str, str] = {}
+        self.valCals: dict[str, any] = {}
+        for it in config:
+            self.rules[it] = (RegexParser(config[it].rule).genNFA())
+            self.valCals[it] = config[it].valCal
+
+
 class LexParser:
-    def __init__(self, config) -> None:
-        rrc = RegexRuleConfig(config)
-        rrc.parseRule()
+    def __init__(self, config, isPy=False) -> None:
+        if not isPy:
+            rrc = RegexRuleConfig(config)
+        else:
+            rrc = PyConfig(config)
+            self.valCal = rrc.valCals
         self.rrc = rrc.rules
         self.row = 0
         self.col = 0
@@ -224,6 +240,10 @@ class LexParser:
         except LexerError as e:
             print(e.message)
         return tokens
+
+    def valcal(self, tokens: list[Token]):
+        for it in tokens:
+            it.value = self.valCal[it](it.value)
 
 
 def main():
